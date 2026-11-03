@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-nexus}
       POSTGRES_USER: ${POSTGRES_USER:-nexus}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in the root .env file}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in your .env file}
     ports:
       - "5434:5432"
     volumes:
@@ -16,6 +16,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+      start_period: 5s
 
   api:
     build:
@@ -24,13 +25,19 @@ services:
     container_name: nexus-api
     restart: unless-stopped
     ports:
-      - "9095:9095"
+      - "${SERVER_PORT:-9095}:9095"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/nexus
+      SERVER_PORT: 9095
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-nexus}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-nexus}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in the root .env file}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in your .env file}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4.1-mini}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://api.openai.com/v1}
+      NEXUS_GEMINI_API_KEY: ${NEXUS_GEMINI_API_KEY:-}
+      NEXUS_ANTHROPIC_API_KEY: ${NEXUS_ANTHROPIC_API_KEY:-}
+      NEXUS_SECURITY_ENABLED: ${NEXUS_SECURITY_ENABLED:-false}
+      NEXUS_JWT_ISSUER_URI: ${NEXUS_JWT_ISSUER_URI:-http://keycloak:8080/realms/i-system-realm}
     depends_on:
       postgres:
         condition: service_healthy

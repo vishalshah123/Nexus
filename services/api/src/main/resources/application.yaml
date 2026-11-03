@@ -1,6 +1,7 @@
 server:
   port: ${SERVER_PORT:9095}
   shutdown: graceful
+
 spring:
   application:
     name: nexus-api
@@ -16,20 +17,7 @@ spring:
     enabled: true
   lifecycle:
     timeout-per-shutdown-phase: 20s
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: ${NEXUS_JWT_ISSUER_URI:http://localhost:8080/realms/i-system-realm}
-nexus:
-  security:
-    enabled: ${NEXUS_SECURITY_ENABLED:false}
-  ai:
-    openai:
-      base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1}
-      api-key: ${OPENAI_API_KEY:}
-      model: ${OPENAI_MODEL:gpt-4.1-mini}
-      timeout-seconds: 60
+
 management:
   endpoints:
     web:
@@ -40,3 +28,11 @@ management:
       probes:
         enabled: true
       show-details: never
+
+nexus:
+  ai:
+    openai:
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1}
+      api-key: ${OPENAI_API_KEY:}
+      model: ${OPENAI_MODEL:gpt-4.1-mini}
+      timeout-seconds: 60

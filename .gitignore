@@ -6,6 +6,32 @@
 *.key
 *.p12
 *.jks
+
+# Java / Maven
+**/target/
+**/build/
+*.class
+*.log
+
+# IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.jks
 **/target/
 **/build/
 *.class
