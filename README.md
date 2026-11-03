@@ -1,93 +1,46 @@
 # NEXUS — The AI Brain
 
-NEXUS is a local-first AI assistant platform. The current repository contains the initial API service and PostgreSQL persistence foundation.
+Java 21 / Spring Boot API with PostgreSQL and Flyway persistence. The main line currently includes user, conversation, message, memory and OpenAI chat APIs.
 
-## Repository layout
+## Runtime configuration
 
-```text
-.
-├── compose.yml
-├── .env.example
-└── services/
-    └── api/
-        ├── Dockerfile
-        ├── pom.xml
-        └── src/
-            ├── main/
-            │   ├── java/com/nexus/api/
-            │   └── resources/
-            │       └── db/migration/
-            └── test/
+Copy `.env.example` to `.env` and replace the database password with a strong local value. The `.env` file is ignored by Git and must never be committed.
+
+- Docker Compose publishes PostgreSQL on host port **5434** and the API on **9095**.
+- The API container connects to PostgreSQL at `postgres:5432`.
+- Running the API from IntelliJ uses `jdbc:postgresql://localhost:5434/nexus`.
+- OpenAI settings use `OPENAI_API_KEY`, `OPENAI_MODEL` and `OPENAI_BASE_URL`.
+
+## Run with Docker
+
+```powershell
+Copy-Item .env.example .env
+# Set POSTGRES_PASSWORD in .env before starting
+docker compose up --build -d
+docker compose ps
 ```
 
-## Prerequisites
+Health: http://localhost:9095/actuator/health
 
-- Docker Engine / Docker Desktop with Docker Compose
-- Java 21 and Maven (only when running the API outside Docker)
+Stop without deleting data:
 
-## Run with Docker Compose
+```powershell
+docker compose down
+```
 
-1. Copy the example environment file:
+## Run locally
 
-   ```bash
-   cp .env.example .env
-   ```
+Start PostgreSQL, then:
 
-   On Windows PowerShell:
-
-   ```powershell
-   Copy-Item .env.example .env
-   ```
-
-2. Replace the placeholder values for `POSTGRES_PASSWORD` and `SPRING_DATASOURCE_PASSWORD` in `.env` with the same strong local password.
-
-3. Build and start the services:
-
-   ```bash
-   docker compose up --build -d
-   ```
-
-4. Check service status and API health:
-
-   ```bash
-   docker compose ps
-   ```
-
-   Open [http://localhost:9095/actuator/health](http://localhost:9095/actuator/health).
-
-5. Stop the services:
-
-   ```bash
-   docker compose down
-   ```
-
-   Add `-v` only when you intentionally want to delete the local PostgreSQL data volume.
-
-## Run the API locally
-
-Start PostgreSQL first (for example, with `docker compose up -d postgres`), then run:
-
-```bash
+```powershell
 cd services/api
-./mvnw spring-boot:run
+mvnw.cmd spring-boot:run
 ```
 
-On Windows use `mvnw.cmd spring-boot:run`.
+## Database
 
-The host-run API uses `SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5433/nexus` by default. Set `POSTGRES_PASSWORD` or `SPRING_DATASOURCE_PASSWORD` in the environment before starting it.
+Flyway owns schema changes under `services/api/src/main/resources/db/migration`. Add sequential migrations; never edit a migration already applied to a persistent database. Hibernate uses `ddl-auto: validate`.
 
-## Database migrations
+## Security and production notes
 
-Flyway migrations live in `services/api/src/main/resources/db/migration`. Add new schema changes as sequential migration files (for example, `V2__add_memory_metadata.sql`). Do not edit a migration that has already been applied to a shared or persistent database.
-
-Hibernate is configured with `ddl-auto=validate`; Flyway owns schema changes.
-
-## Current implementation scope
-
-The API currently provides the Spring Boot application bootstrap, PostgreSQL/Flyway configuration, and the initial users, conversations, messages, and memories schema. Domain APIs, authentication/authorization, AI-provider integration, and automated integration coverage are not implemented yet.
-
-## Configuration and secrets
-
-- Never commit `.env` or real credentials.
-- Keep local secrets in your untracked `.env` file or inject them through the deployment environment.
-- The values in `.env.example` are placeholders, not production credentials.
+The current API is a development foundation, not a production-secure multi-tenant service. Do not expose it publicly until JWT authentication and per-user authorization are enforced on every endpoint. Keep provider credentials and database passwords out of source control. Use a local untracked `.env` or a secrets manager.
