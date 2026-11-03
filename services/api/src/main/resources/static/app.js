@@ -1,7 +1,7 @@
 const $ = (id) => document.getElementById(id);
 const state = { userId: localStorage.getItem("nexus.userId") || "", conversationId: "", conversations: [], messages: [] };
 const api = async (path, options = {}) => {
-  const response = await fetch(path, { headers: { "Content-Type": "application/json", ...(options.headers || {}) }, ...options });
+  const response = await fetch(path, { ...options, headers: { "Content-Type": "application/json", ...(options.headers || {}) } });
   if (response.status === 204) return null;
   const raw = await response.text();
   let data; try { data = raw ? JSON.parse(raw) : null; } catch { data = raw; }
