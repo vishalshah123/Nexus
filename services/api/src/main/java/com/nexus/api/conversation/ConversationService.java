@@ -5,9 +5,9 @@ import com.nexus.api.conversation.dto.ConversationResponses.*;
 import com.nexus.api.conversation.entity.ConversationEntity;
 import com.nexus.api.conversation.entity.MessageEntity;
 import com.nexus.api.conversation.entity.UserEntity;
-import com.nexus.api.conversation.repository.ConversationRepository;
+import com.nexus.api.conversation.repository.ConversationEntityRepository;
 import com.nexus.api.conversation.repository.MessageRepository;
-import com.nexus.api.conversation.repository.UserRepository;
+import com.nexus.api.conversation.repository.ConversationUserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -18,17 +18,17 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
-@Service
+@Service("managedConversationService")
 @Transactional
 public class ConversationService {
     private static final Set<String> ALLOWED_ROLES = Set.of("system", "user", "assistant", "tool");
 
-    private final UserRepository userRepository;
-    private final ConversationRepository conversationRepository;
+    private final ConversationUserRepository userRepository;
+    private final ConversationEntityRepository conversationRepository;
     private final MessageRepository messageRepository;
 
-    public ConversationService(UserRepository userRepository,
-                               ConversationRepository conversationRepository,
+    public ConversationService(ConversationUserRepository userRepository,
+                               ConversationEntityRepository conversationRepository,
                                MessageRepository messageRepository) {
         this.userRepository = userRepository;
         this.conversationRepository = conversationRepository;

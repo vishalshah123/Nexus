@@ -14,7 +14,7 @@ public class ToolController {
   else if(r.toolName().equals("nexus.echo")){Object text=args.get("text");if(!(text instanceof String s)||s.length()>4000)
    throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST,"text must be a string up to 4000 chars");result=s;}
   else throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND,"Tool is not allowlisted");
-  String json=new com.fasterxml.jackson.databind.ObjectMapper().valueToTree(args).toString();
+  String json=new tools.jackson.databind.ObjectMapper().valueToTree(args).toString();
   db.update("INSERT INTO nexus_tool_audit(id,user_id,tool_name,arguments,status) VALUES(?,?,?,?::jsonb,'SUCCEEDED')",UUID.randomUUID(),userId,r.toolName(),json);
   return Map.of("tool",r.toolName(),"result",result);
  }

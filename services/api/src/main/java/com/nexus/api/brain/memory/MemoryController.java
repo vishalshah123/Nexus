@@ -2,8 +2,9 @@ package com.nexus.api.brain.memory;
 import jakarta.validation.Valid; import jakarta.validation.constraints.*;
 import org.springframework.jdbc.core.JdbcTemplate; import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*; import java.util.*;
-@RestController @RequestMapping("/api/v1/users/{userId}/memories") @Validated
+@RestController("brainMemoryController") @RequestMapping("/api/v1/users/{userId}/memories") @Validated
 public class MemoryController {
+ private static final tools.jackson.databind.ObjectMapper JSON = tools.jackson.databind.json.JsonMapper.builder().build();
  private final JdbcTemplate db; public MemoryController(JdbcTemplate db){this.db=db;}
  public record Request(@NotBlank @Size(max=12000) String content,@Size(max=100) String category,
   @Size(max=100) String source,@Min(1) @Max(5) Integer importance,List<String> tags){}
@@ -28,10 +29,10 @@ public class MemoryController {
  public void delete(@PathVariable UUID userId,@PathVariable UUID id){if(db.update("DELETE FROM memories WHERE user_id=? AND id=?",userId,id)==0)
   throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND,"Memory not found");}
  private static Memory map(java.sql.ResultSet rs)throws java.sql.SQLException{
-  List<String> tags; try{tags=new com.fasterxml.jackson.databind.ObjectMapper().readValue(rs.getString("tags"),new com.fasterxml.jackson.core.type.TypeReference<List<String>>(){});}catch(Exception e){tags=List.of();}
+  List<String> tags=JSON.readValue(rs.getString("tags"),new tools.jackson.core.type.TypeReference<List<String>>(){});
   return new Memory(rs.getObject("id",UUID.class),rs.getString("content"),rs.getString("category"),rs.getString("source"),rs.getInt("importance"),tags,
    rs.getObject("created_at",java.time.OffsetDateTime.class),rs.getObject("updated_at",java.time.OffsetDateTime.class));}
  private static String json(List<String> tags){if(tags==null)return "[]";if(tags.size()>30||tags.stream().anyMatch(t->t==null||t.length()>40))
   throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST,"Invalid tags");
-  return new com.fasterxml.jackson.databind.ObjectMapper().valueToTree(tags).toString();}
+  return JSON.valueToTree(tags).toString();}
 }

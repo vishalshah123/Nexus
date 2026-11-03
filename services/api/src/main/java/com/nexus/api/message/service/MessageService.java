@@ -1,11 +1,11 @@
 package com.nexus.api.message.service;
 
 import com.nexus.api.common.exception.NotFoundException;
-import com.nexus.api.conversation.repository.ConversationRepository;
+import com.nexus.api.conversation.repository.LegacyConversationRepository;
 import com.nexus.api.message.dto.CreateMessageRequest;
 import com.nexus.api.message.dto.MessageResponse;
 import com.nexus.api.message.entity.Message;
-import com.nexus.api.message.repository.MessageRepository;
+import com.nexus.api.message.repository.LegacyMessageRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,10 +15,10 @@ import java.util.UUID;
 
 @Service
 public class MessageService {
-    private final MessageRepository messages;
-    private final ConversationRepository conversations;
+    private final LegacyMessageRepository messages;
+    private final LegacyConversationRepository conversations;
 
-    public MessageService(MessageRepository messages, ConversationRepository conversations) {
+    public MessageService(LegacyMessageRepository messages, LegacyConversationRepository conversations) {
         this.messages = messages;
         this.conversations = conversations;
     }

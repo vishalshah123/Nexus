@@ -9,7 +9,7 @@ public class BackgroundTaskController {
  public Map<String,Object> enqueue(@PathVariable UUID userId,@Valid @RequestBody TaskRequest r){
   if(!Set.of("CONTEXT_SNAPSHOT","MEMORY_REINDEX","CONVERSATION_SUMMARY").contains(r.taskType()))
    throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST,"Unsupported task type");
-  UUID id=UUID.randomUUID();String json=new com.fasterxml.jackson.databind.ObjectMapper().valueToTree(r.payload()==null?Map.of():r.payload()).toString();
+  UUID id=UUID.randomUUID();String json=new tools.jackson.databind.ObjectMapper().valueToTree(r.payload()==null?Map.of():r.payload()).toString();
   db.update("INSERT INTO background_tasks(id,user_id,task_type,payload) VALUES(?,?,?,?::jsonb)",id,userId,r.taskType(),json);
   return Map.of("id",id,"taskType",r.taskType(),"status","QUEUED");
  }

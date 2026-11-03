@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @Validated
-@RestController
+@RestController("managedConversationController")
 @RequestMapping("/api/v1/users/{userId}/conversations")
 public class ConversationController {
     private final ConversationService service;

@@ -1,9 +1,9 @@
 package com.nexus.api.brain.ai;
-import com.fasterxml.jackson.databind.JsonNode; import org.springframework.beans.factory.annotation.Value;
+import tools.jackson.databind.JsonNode; import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType; import org.springframework.stereotype.Component; import org.springframework.web.client.RestClient; import java.util.*;
 @Component class OpenAiProvider implements AiProvider {
  private final RestClient http; private final String key;
- OpenAiProvider(RestClient.Builder b,@Value("${NEXUS_OPENAI_API_KEY:${OPENAI_API_KEY:}}") String k,@Value("${NEXUS_OPENAI_BASE_URL:${OPENAI_BASE_URL:https://api.openai.com/v1}}") String url){key=k;http=b.baseUrl(url).build();}
+ OpenAiProvider(@Value("${NEXUS_OPENAI_API_KEY:${OPENAI_API_KEY:}}") String k,@Value("${NEXUS_OPENAI_BASE_URL:${OPENAI_BASE_URL:https://api.openai.com/v1}}") String url){key=k;http=RestClient.builder().baseUrl(url).build();}
  public String name(){return "openai";}
  public AiResponse generate(AiRequest r){if(key.isBlank())throw new IllegalStateException("NEXUS_OPENAI_API_KEY is missing");
   var msgs=new ArrayList<Map<String,String>>();if(r.systemPrompt()!=null&&!r.systemPrompt().isBlank())msgs.add(Map.of("role","system","content",r.systemPrompt()));
@@ -14,7 +14,7 @@ import org.springframework.http.MediaType; import org.springframework.stereotype
 }
 @Component class GeminiProvider implements AiProvider {
  private final RestClient http;private final String key;
- GeminiProvider(RestClient.Builder b,@Value("${NEXUS_GEMINI_API_KEY:}") String k,@Value("${NEXUS_GEMINI_BASE_URL:https://generativelanguage.googleapis.com/v1beta}") String url){key=k;http=b.baseUrl(url).build();}
+ GeminiProvider(@Value("${NEXUS_GEMINI_API_KEY:}") String k,@Value("${NEXUS_GEMINI_BASE_URL:https://generativelanguage.googleapis.com/v1beta}") String url){key=k;http=RestClient.builder().baseUrl(url).build();}
  public String name(){return "gemini";}
  public AiResponse generate(AiRequest r){if(key.isBlank())throw new IllegalStateException("NEXUS_GEMINI_API_KEY is missing");
   var contents=r.messages().stream().map(m->Map.of("role",m.role().equals("assistant")?"model":"user","parts",List.of(Map.of("text",m.content())))).toList();
@@ -25,7 +25,7 @@ import org.springframework.http.MediaType; import org.springframework.stereotype
 }
 @Component class ClaudeProvider implements AiProvider {
  private final RestClient http;private final String key;
- ClaudeProvider(RestClient.Builder b,@Value("${NEXUS_ANTHROPIC_API_KEY:}") String k,@Value("${NEXUS_ANTHROPIC_BASE_URL:https://api.anthropic.com/v1}") String url){key=k;http=b.baseUrl(url).build();}
+ ClaudeProvider(@Value("${NEXUS_ANTHROPIC_API_KEY:}") String k,@Value("${NEXUS_ANTHROPIC_BASE_URL:https://api.anthropic.com/v1}") String url){key=k;http=RestClient.builder().baseUrl(url).build();}
  public String name(){return "claude";}
  public AiResponse generate(AiRequest r){if(key.isBlank())throw new IllegalStateException("NEXUS_ANTHROPIC_API_KEY is missing");
   var msgs=r.messages().stream().filter(m->!m.role().equals("system")).map(m->Map.of("role",m.role().equals("assistant")?"assistant":"user","content",m.content())).toList();

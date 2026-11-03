@@ -4,7 +4,7 @@ import com.nexus.api.common.exception.NotFoundException;
 import com.nexus.api.conversation.dto.ConversationResponse;
 import com.nexus.api.conversation.dto.CreateConversationRequest;
 import com.nexus.api.conversation.entity.Conversation;
-import com.nexus.api.conversation.repository.ConversationRepository;
+import com.nexus.api.conversation.repository.LegacyConversationRepository;
 import com.nexus.api.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,12 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
-@Service
+@Service("legacyConversationService")
 public class ConversationService {
-    private final ConversationRepository conversations;
+    private final LegacyConversationRepository conversations;
     private final UserRepository users;
 
-    public ConversationService(ConversationRepository conversations, UserRepository users) {
+    public ConversationService(LegacyConversationRepository conversations, UserRepository users) {
         this.conversations = conversations;
         this.users = users;
     }

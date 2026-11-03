@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-@RestController
+@RestController("legacyConversationController")
 @RequestMapping("/api/conversations")
 public class ConversationController {
     private final ConversationService service;
