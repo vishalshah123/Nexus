@@ -1,12 +1,7 @@
-CREATE TABLE memory_entries (
- id UUID PRIMARY KEY, user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
- content TEXT NOT NULL, category VARCHAR(80) NOT NULL DEFAULT 'GENERAL',
- source VARCHAR(120), importance SMALLINT NOT NULL DEFAULT 3 CHECK (importance BETWEEN 1 AND 5),
- tags JSONB NOT NULL DEFAULT '[]'::jsonb, created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
- updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-CREATE INDEX idx_memory_entries_user_updated ON memory_entries(user_id,updated_at DESC);
-CREATE INDEX idx_memory_entries_tags ON memory_entries USING GIN(tags);
+ALTER TABLE memories ADD COLUMN importance SMALLINT NOT NULL DEFAULT 3 CHECK (importance BETWEEN 1 AND 5);
+ALTER TABLE memories ADD COLUMN tags JSONB NOT NULL DEFAULT '[]'::jsonb;
+CREATE INDEX idx_memories_user_importance ON memories(user_id,importance DESC,updated_at DESC);
+CREATE INDEX idx_memories_tags ON memories USING GIN(tags);
 CREATE TABLE nexus_tool_audit (
  id UUID PRIMARY KEY, user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
  tool_name VARCHAR(120) NOT NULL, arguments JSONB NOT NULL DEFAULT '{}'::jsonb,
