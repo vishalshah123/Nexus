@@ -20,7 +20,7 @@ import org.springframework.http.MediaType; import org.springframework.stereotype
   var contents=r.messages().stream().map(m->Map.of("role",m.role().equals("assistant")?"model":"user","parts",List.of(Map.of("text",m.content())))).toList();
   var body=new HashMap<String,Object>();body.put("contents",contents);body.put("generationConfig",Map.of("temperature",r.temperature(),"maxOutputTokens",r.maxTokens()));
   if(r.systemPrompt()!=null&&!r.systemPrompt().isBlank())body.put("systemInstruction",Map.of("parts",List.of(Map.of("text",r.systemPrompt()))));
-  JsonNode out=http.post().uri("/models/{model}:generateContent?key={key}",r.model(),key).body(body).retrieve().body(JsonNode.class);
+  JsonNode out=http.post().uri("/models/{model}:generateContent",r.model()).header("x-goog-api-key",key).body(body).retrieve().body(JsonNode.class);
   return new AiResponse(name(),r.model(),out.path("candidates").path(0).path("content").path("parts").path(0).path("text").asText());}
 }
 @Component class ClaudeProvider implements AiProvider {
