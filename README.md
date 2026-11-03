@@ -1,70 +1,38 @@
 # NEXUS — The AI Brain
 
-NEXUS is a Java 21 / Spring Boot API foundation for persistent conversations, long-term memory, AI-provider orchestration, context retrieval, controlled tools and background work.
+Java 21 / Spring Boot API with PostgreSQL and Flyway. This branch extends the main backend with multi-provider AI, enriched long-term memory, context retrieval, controlled tools, background-task records and an OAuth2 resource-server foundation.
 
-## Capabilities added in this branch
-
-- **AI provider abstraction:** one `AiProvider` contract with OpenAI, Gemini and Anthropic Claude adapters. API keys are environment variables; no credentials are committed.
-- **Long-term memory API:** create, search, update and delete user memories with category, source, importance and tags.
-- **Context retrieval API:** assemble a bounded set of recent conversation messages and high-importance memories for an AI request.
-- **Tool registry:** exposes only `nexus.time` and `nexus.echo` (read-only/safe demo tools) and writes an execution audit record. Arbitrary shell, SQL, filesystem, trading and messaging tools are deliberately not implemented.
-- **Background task queue API:** persist, list, inspect and cancel queued task records. **A worker/dispatcher is not included yet**, so tasks remain QUEUED until a worker is implemented and deployed.
-- **OAuth2 resource-server security foundation:** optional JWT validation using a configured issuer. Enable with `NEXUS_SECURITY_ENABLED=true` and configure `NEXUS_JWT_ISSUER_URI`.
+## Capabilities
+- Main APIs: user, conversation, message, OpenAI chat and basic memory.
+- **Multi-provider AI:** common provider interface with OpenAI, Gemini and Anthropic Claude adapters.
+- **Long-term memory:** create, search, update and delete memories with category, importance and tags.
+- **Context retrieval:** bounded recent messages plus high-importance memories.
+- **Tool registry:** only `nexus.time` and `nexus.echo`; execution is audited. No arbitrary shell, SQL, filesystem, trading or messaging tools.
+- **Background tasks:** durable enqueue/list/get/cancel API. No worker is included yet; queued tasks remain QUEUED.
+- **JWT foundation:** optional OAuth2 resource-server validation. Enable with `NEXUS_SECURITY_ENABLED=true` and set `NEXUS_JWT_ISSUER_URI`.
 
 ## Configuration
+Database host port **5434** (Compose container port 5432); API port **9095**.
+- OpenAI: `OPENAI_API_KEY`, `OPENAI_MODEL`, `OPENAI_BASE_URL`. Provider adapter also accepts `NEXUS_OPENAI_API_KEY` as an override.
+- Gemini: `NEXUS_GEMINI_API_KEY`
+- Claude: `NEXUS_ANTHROPIC_API_KEY`
+- JWT: `NEXUS_SECURITY_ENABLED`, `NEXUS_JWT_ISSUER_URI`
 
-Database:
-- `SPRING_DATASOURCE_URL` (local default: `jdbc:postgresql://localhost:5433/nexus`)
-- `SPRING_DATASOURCE_USERNAME`
-- `POSTGRES_PASSWORD`
+Copy `.env.example` to `.env` and set local secrets. Never commit `.env`.
 
-AI provider credentials:
-- `NEXUS_OPENAI_API_KEY`
-- `NEXUS_GEMINI_API_KEY`
-- `NEXUS_ANTHROPIC_API_KEY`
-
-Optional provider base URLs:
-- `NEXUS_OPENAI_BASE_URL`
-- `NEXUS_GEMINI_BASE_URL`
-- `NEXUS_ANTHROPIC_BASE_URL`
-
-## API surface
-
+## Additional endpoints
 | Capability | Endpoint |
 |---|---|
-| Provider list | `GET /api/v1/ai/providers` |
+| Providers | `GET /api/v1/ai/providers` |
 | AI completion | `POST /api/v1/ai/chat` |
 | Memory CRUD/search | `/api/v1/users/{userId}/memories` |
-| Context assembly | `GET /api/v1/users/{userId}/context?messageLimit=10&memoryLimit=10` |
+| Context | `GET /api/v1/users/{userId}/context` |
 | Tool catalog | `GET /api/v1/tools` |
-| Safe tool execution | `POST /api/v1/tools/execute` |
-| Background task queue | `/api/v1/users/{userId}/tasks` |
+| Tool execution | `POST /api/v1/tools/execute` |
+| Background tasks | `/api/v1/users/{userId}/tasks` |
 
-Memory create example:
-```json
-{
-  "content": "Prefers concise technical explanations",
-  "category": "PREFERENCE",
-  "source": "conversation",
-  "importance": 4,
-  "tags": ["response-style", "profile"]
-}
-```
+## Migration ordering
+Main has `V1__initial_schema.sql` and `V2__add_memory_source_and_indexes.sql`. This branch adds `V3__nexus_brain_features.sql`. Never edit migrations already applied to a persistent database.
 
-AI chat example:
-```json
-{
-  "provider": "openai",
-  "model": "gpt-4.1-mini",
-  "messages": [{"role": "user", "content": "Summarize this context"}],
-  "systemPrompt": "You are NEXUS.",
-  "temperature": 0.4,
-  "maxTokens": 1200
-}
-```
-
-## Security and production readiness
-
-The security filter is disabled by default for local development. Before exposing NEXUS, enable JWT validation and configure a trusted issuer. The current APIs still accept `userId` in the URL, and the demo tool endpoint accepts `X-Nexus-User-Id`; these are **not identity proofs**. Next security work must map the validated JWT subject to an internal user and enforce ownership on every endpoint. Do not expose this branch publicly until that is complete.
-
-Provider calls are synchronous. Add outbound timeouts, retry budgets, rate limiting, token/cost accounting and secret-safe logging before production. Background task records are durable but not yet processed by a worker. No arbitrary code or high-impact tool execution is enabled.
+## Production readiness
+JWT validation exists, but routes still accept user IDs in paths/headers; map JWT subject to internal user and enforce ownership before public exposure. Provider calls need production timeout/retry/rate-limit/cost controls. Background queue records need a worker. No high-impact tools are enabled.

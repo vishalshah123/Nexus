@@ -3,7 +3,7 @@ import com.fasterxml.jackson.databind.JsonNode; import org.springframework.beans
 import org.springframework.http.MediaType; import org.springframework.stereotype.Component; import org.springframework.web.client.RestClient; import java.util.*;
 @Component class OpenAiProvider implements AiProvider {
  private final RestClient http; private final String key;
- OpenAiProvider(RestClient.Builder b,@Value("${NEXUS_OPENAI_API_KEY:}") String k,@Value("${NEXUS_OPENAI_BASE_URL:https://api.openai.com/v1}") String url){key=k;http=b.baseUrl(url).build();}
+ OpenAiProvider(RestClient.Builder b,@Value("${NEXUS_OPENAI_API_KEY:${OPENAI_API_KEY:}}") String k,@Value("${NEXUS_OPENAI_BASE_URL:${OPENAI_BASE_URL:https://api.openai.com/v1}}") String url){key=k;http=b.baseUrl(url).build();}
  public String name(){return "openai";}
  public AiResponse generate(AiRequest r){if(key.isBlank())throw new IllegalStateException("NEXUS_OPENAI_API_KEY is missing");
   var msgs=new ArrayList<Map<String,String>>();if(r.systemPrompt()!=null&&!r.systemPrompt().isBlank())msgs.add(Map.of("role","system","content",r.systemPrompt()));
