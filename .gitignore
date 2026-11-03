@@ -24,23 +24,3 @@
 .DS_Store
 Thumbs.db
 desktop.ini
-# Local environment and secrets
-.env
-.env.*
-!.env.example
-*.pem
-*.key
-*.p12
-*.jks
-**/target/
-**/build/
-*.class
-*.log
-.idea/
-*.iml
-*.ipr
-*.iws
-.vscode/
-.DS_Store
-Thumbs.db
-desktop.ini
