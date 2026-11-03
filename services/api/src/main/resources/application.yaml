@@ -17,7 +17,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${NEXUS_JWT_ISSUER_URI:http://localhost:8080/realms/nexus}
+          issuer-uri: ${NEXUS_JWT_ISSUER_URI:http://localhost:8080/realms/i-system-realm}
 nexus:
   security:
     enabled: ${NEXUS_SECURITY_ENABLED:false}
