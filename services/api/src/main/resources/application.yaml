@@ -1,5 +1,6 @@
 server:
-  port: 9095
+  port: ${SERVER_PORT:9095}
+  shutdown: graceful
 
 spring:
   application:
@@ -14,6 +15,8 @@ spring:
     open-in-view: false
   flyway:
     enabled: true
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
 
 management:
   endpoints:
@@ -24,6 +27,7 @@ management:
     health:
       probes:
         enabled: true
+      show-details: never
 
 nexus:
   ai:
