@@ -5,8 +5,8 @@ import org.springframework.web.bind.annotation.*; import java.util.*;
 @RestController @RequestMapping("/api/v1/users/{userId}/memories") @Validated
 public class MemoryController {
  private final JdbcTemplate db; public MemoryController(JdbcTemplate db){this.db=db;}
- public record Request(@NotBlank @Size(max=12000) String content,@Size(max=80) String category,
-  @Size(max=120) String source,@Min(1) @Max(5) Integer importance,List<String> tags){}
+ public record Request(@NotBlank @Size(max=12000) String content,@Size(max=100) String category,
+  @Size(max=100) String source,@Min(1) @Max(5) Integer importance,List<String> tags){}
  public record Memory(UUID id,String content,String category,String source,int importance,List<String> tags,
   java.time.OffsetDateTime createdAt,java.time.OffsetDateTime updatedAt){}
  @PostMapping public Memory create(@PathVariable UUID userId,@Valid @RequestBody Request r){
