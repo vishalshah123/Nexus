@@ -1,60 +1,46 @@
-# NEXUS Complete Backend Bundle
+# NEXUS — The AI Brain
 
-Java 21 / Spring Boot API source bundle for the existing NEXUS repository.
+Java 21 / Spring Boot API with PostgreSQL and Flyway persistence. The main line currently includes user, conversation, message, memory and OpenAI chat APIs.
 
-## Features
-- User create and lookup
-- Conversation create/list
-- Message create/list, ordered by sequence number
-- OpenAI Chat Completions integration through `POST /api/conversations/{conversationId}/chat`
-- Conversation history is sent to OpenAI; user and assistant messages are persisted
-- User memories create/list/delete
-- Bean validation and consistent API error responses
-- PostgreSQL + Flyway migration
-- Postman collection
-- Docker Compose example and health endpoint
+## Runtime configuration
 
-## Install into existing repository
+Copy `.env.example` to `.env` and replace the database password with a strong local value. The `.env` file is ignored by Git and must never be committed.
 
-1. Back up `E:\\Nexus\\services\\api` before replacing anything.
-2. Copy this bundle's `services/api/src/main/java/com/nexus/api` into:
-   `E:\\Nexus\\services\\api\\src\\main\\java\\com\\nexus\\api`
-3. Copy `services/api/pom.xml`, `services/api/Dockerfile`, and `services/api/src/main/resources/application.yaml` into the corresponding existing locations.
-4. Do NOT delete the existing `V1__initial_schema.sql` or database volume. This bundle includes the existing V1 schema as a reference plus `V2__add_memory_source_and_indexes.sql`. If your existing V1 has already run, Flyway will only run V2.
-5. If your existing V1 differs from the reference, review V2 before starting.
-6. Add `OPENAI_API_KEY` to your local environment. Never commit the key.
+- Docker Compose publishes PostgreSQL on host port **5434** and the API on **9095**.
+- The API container connects to PostgreSQL at `postgres:5432`.
+- Running the API from IntelliJ uses `jdbc:postgresql://localhost:5434/nexus`.
+- OpenAI settings use `OPENAI_API_KEY`, `OPENAI_MODEL` and `OPENAI_BASE_URL`.
 
-## Environment variables
+## Run with Docker
 
-- `SPRING_DATASOURCE_URL`: defaults to `jdbc:postgresql://localhost:5434/nexus` for running from IntelliJ on Windows.
-- `SPRING_DATASOURCE_USERNAME`: defaults to `nexus`.
-- `SPRING_DATASOURCE_PASSWORD`: use the actual password configured for the PostgreSQL `nexus` role.
-- `OPENAI_API_KEY`: required only for the AI chat endpoint.
-- `OPENAI_MODEL`: defaults to `gpt-4.1-mini`.
-
-When running through Docker Compose, API connects to `jdbc:postgresql://postgres:5432/nexus`. The Compose example publishes PostgreSQL on host port 5434 and API on 9095.
-
-## Build and run
-
-From `E:\\Nexus\\services\\api`:
 ```powershell
-.\\mvnw.cmd -DskipTests compile
+Copy-Item .env.example .env
+# Set POSTGRES_PASSWORD in .env before starting
+docker compose up --build -d
+docker compose ps
 ```
 
-From `E:\\Nexus`:
+Health: http://localhost:9095/actuator/health
+
+Stop without deleting data:
+
 ```powershell
-docker compose up -d --build
+docker compose down
 ```
 
-Check:
-`http://localhost:9095/actuator/health`
+## Run locally
 
-## Postman
+Start PostgreSQL, then:
 
-Import `postman/NEXUS-Complete-API.postman_collection.json`. Run requests in order. Create User and Create Conversation requests save returned IDs to collection variables. AI chat requires `OPENAI_API_KEY` in the API process/container.
+```powershell
+cd services/api
+mvnw.cmd spring-boot:run
+```
 
-## Important design notes
-- This is a development-ready baseline, not a production-secure multi-tenant deployment. Authentication/authorization is not yet implemented. Do not expose it publicly.
-- The initial message sequence allocation uses `MAX(sequence_number) + 1`; concurrent writes to one conversation can race. Use a database-side atomic allocator/locking strategy before production.
-- OpenAI requests are made server-side. The API key is never returned to clients.
-- No real AI response is generated if `OPENAI_API_KEY` is missing; the chat endpoint returns a configuration error.
+## Database
+
+Flyway owns schema changes under `services/api/src/main/resources/db/migration`. Add sequential migrations; never edit a migration already applied to a persistent database. Hibernate uses `ddl-auto: validate`.
+
+## Security and production notes
+
+The current API is a development foundation, not a production-secure multi-tenant service. Do not expose it publicly until JWT authentication and per-user authorization are enforced on every endpoint. Keep provider credentials and database passwords out of source control. Use a local untracked `.env` or a secrets manager.
