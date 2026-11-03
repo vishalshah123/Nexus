@@ -5,20 +5,16 @@ server:
 spring:
   application:
     name: nexus-api
-
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/nexus}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5434/nexus}
     username: ${SPRING_DATASOURCE_USERNAME:nexus}
     password: ${SPRING_DATASOURCE_PASSWORD:${POSTGRES_PASSWORD}}
-
   jpa:
-    open-in-view: false
     hibernate:
       ddl-auto: validate
-
+    open-in-view: false
   flyway:
     enabled: true
-
   lifecycle:
     timeout-per-shutdown-phase: 20s
 
@@ -32,3 +28,11 @@ management:
       probes:
         enabled: true
       show-details: never
+
+nexus:
+  ai:
+    openai:
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1}
+      api-key: ${OPENAI_API_KEY:}
+      model: ${OPENAI_MODEL:gpt-4.1-mini}
+      timeout-seconds: 60
