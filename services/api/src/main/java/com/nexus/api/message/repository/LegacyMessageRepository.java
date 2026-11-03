@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.UUID;
 
-public interface MessageRepository extends JpaRepository<Message, UUID> {
+public interface LegacyMessageRepository extends JpaRepository<Message, UUID> {
     List<Message> findAllByConversationIdOrderBySequenceNumberAsc(UUID conversationId);
 
     @Query("select coalesce(max(m.sequenceNumber), 0) from Message m where m.conversationId = :id")

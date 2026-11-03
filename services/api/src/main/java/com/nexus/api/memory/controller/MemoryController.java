@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-@RestController
+@RestController("legacyMemoryController")
 @RequestMapping("/api/users/{userId}/memories")
 public class MemoryController {
     private final MemoryService service;

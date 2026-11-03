@@ -30,6 +30,10 @@ management:
       show-details: never
 
 nexus:
+  security:
+    enabled: ${NEXUS_SECURITY_ENABLED:false}
+  jwt:
+    issuer-uri: ${NEXUS_JWT_ISSUER_URI:http://localhost:8080/realms/i-system-realm}
   ai:
     openai:
       base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1}

@@ -6,10 +6,10 @@ import com.nexus.api.ai.dto.ChatRequest;
 import com.nexus.api.ai.dto.ChatResponse;
 import com.nexus.api.common.exception.NotFoundException;
 import com.nexus.api.conversation.entity.Conversation;
-import com.nexus.api.conversation.repository.ConversationRepository;
+import com.nexus.api.conversation.repository.LegacyConversationRepository;
 import com.nexus.api.message.dto.MessageResponse;
 import com.nexus.api.message.entity.Message;
-import com.nexus.api.message.repository.MessageRepository;
+import com.nexus.api.message.repository.LegacyMessageRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -27,11 +27,11 @@ import java.util.UUID;
 public class OpenAiChatService {
     private final RestClient client;
     private final OpenAiProperties properties;
-    private final ConversationRepository conversations;
-    private final MessageRepository messages;
+    private final LegacyConversationRepository conversations;
+    private final LegacyMessageRepository messages;
 
     public OpenAiChatService(RestClient openAiRestClient, OpenAiProperties properties,
-                             ConversationRepository conversations, MessageRepository messages) {
+                             LegacyConversationRepository conversations, LegacyMessageRepository messages) {
         this.client = openAiRestClient;
         this.properties = properties;
         this.conversations = conversations;

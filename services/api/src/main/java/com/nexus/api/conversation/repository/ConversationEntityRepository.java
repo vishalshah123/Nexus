@@ -12,7 +12,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface ConversationRepository extends JpaRepository<ConversationEntity, UUID> {
+public interface ConversationEntityRepository extends JpaRepository<ConversationEntity, UUID> {
     Page<ConversationEntity> findAllByUser_IdOrderByUpdatedAtDesc(UUID userId, Pageable pageable);
 
     Optional<ConversationEntity> findByIdAndUser_Id(UUID id, UUID userId);
