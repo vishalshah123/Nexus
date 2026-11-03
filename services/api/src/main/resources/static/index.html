@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1110">
+  <title>NEXUS — The AI Brain</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="/"><span class="brand-mark">N</span><span><b>NEXUS</b><small>THE AI BRAIN</small></span></a>
+      <div class="workspace-label">WORKSPACE</div>
+      <button class="nav-item active" data-view="chat"><span class="nav-icon">✳</span> AI Workspace</button>
+      <button class="nav-item" data-view="memory"><span class="nav-icon">◈</span> Long-term Memory</button>
+      <button class="nav-item" data-view="tools"><span class="nav-icon">⌘</span> Tools & Tasks</button>
+      <div class="sidebar-bottom">
+        <div class="api-status"><span class="status-dot" id="statusDot"></span><span id="apiStatus">Checking API…</span></div>
+        <div class="user-card"><div class="avatar">N</div><div><b id="sidebarUser">Local workspace</b><small>Development mode</small></div></div>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div><div class="eyebrow">PERSONAL AI OPERATING SYSTEM</div><h1 id="pageTitle">AI Workspace</h1></div>
+        <div class="top-actions"><span class="env-pill"><i></i> LOCAL INSTANCE</span><button class="icon-button" id="refreshBtn" title="Refresh data">↻</button></div>
+      </header>
+      <div class="dev-warning"><span>⚠</span><span><b>Development mode</b> — API authentication is disabled by default. Keep this console on localhost; do not expose it publicly.</span></div>
+
+      <section class="view active" id="chatView">
+        <div class="workspace-grid">
+          <aside class="panel conversation-panel">
+            <div class="panel-heading"><div><span class="eyebrow">YOUR SPACE</span><h2>Conversations</h2></div><button class="small-button" id="newConversationBtn">＋ New</button></div>
+            <div class="user-select-wrap"><label for="userSelect">ACTIVE USER</label><select id="userSelect"><option value="">Loading users…</option></select></div>
+            <div class="user-create"><input id="newUserName" placeholder="Display name"><input id="newUserEmail" type="email" placeholder="Email address"><button class="outline-button" id="createUserBtn">Create user</button></div>
+            <div class="conversation-list" id="conversationList"><div class="empty-state">Select a user to load conversations.</div></div>
+            <div class="panel-foot"><span class="tiny-dot"></span> Stored in PostgreSQL</div>
+          </aside>
+          <section class="panel chat-panel">
+            <div class="chat-heading"><div><div class="eyebrow">NEXUS ASSISTANT</div><h2 id="chatTitle">Start a conversation</h2><p id="chatSubtitle">Your context-aware AI workspace</p></div><span class="model-tag">OPENAI · CHAT</span></div>
+            <div class="messages" id="messages"><div class="welcome"><div class="welcome-orb">✳</div><h2>Think beyond the prompt.</h2><p>NEXUS brings conversations, memory and tools into one workspace. Create a user, start a conversation and send your first message.</p><div class="suggestions"><button data-prompt="What can you help me build today?">What can you help me build?</button><button data-prompt="Explain how long-term memory should work in an AI assistant.">Explore memory design</button></div></div></div>
+            <form class="composer" id="chatForm"><textarea id="messageInput" rows="1" placeholder="Message NEXUS… (Enter to send, Shift + Enter for new line)" disabled></textarea><button id="sendBtn" type="submit" disabled><span>↑</span></button></form>
+            <div class="composer-note">NEXUS can make mistakes. Verify important information.</div>
+          </section>
+        </div>
+      </section>
+
+      <section class="view" id="memoryView">
+        <div class="section-intro"><div><span class="eyebrow">PERSONAL CONTEXT ENGINE</span><h2>Long-term Memory</h2><p>Store facts and context that NEXUS can retrieve across conversations.</p></div></div>
+        <div class="memory-layout">
+          <form class="panel memory-form" id="memoryForm"><div class="panel-heading"><div><span class="eyebrow">MEMORY STORE</span><h2>Add a memory</h2></div></div><label>MEMORY CONTENT</label><textarea id="memoryContent" rows="5" placeholder="What should NEXUS remember?" required></textarea><label>CATEGORY</label><input id="memoryCategory" placeholder="e.g. PREFERENCE, PROJECT, WORK"><label>SOURCE</label><input id="memorySource" placeholder="e.g. user, imported, conversation"><button class="primary-button" type="submit">Save memory <span>↗</span></button></form>
+          <div class="panel memory-list-panel"><div class="panel-heading"><div><span class="eyebrow">RETRIEVABLE CONTEXT</span><h2>Saved memories</h2></div><button class="outline-button" id="loadMemoriesBtn">Refresh</button></div><div id="memoryList" class="memory-list"><div class="empty-state">Choose an active user to view memories.</div></div></div>
+        </div>
+      </section>
+
+      <section class="view" id="toolsView">
+        <div class="section-intro"><div><span class="eyebrow">EXTENSION LAYER</span><h2>Tools & Background Tasks</h2><p>Run the currently allowlisted demo tools and inspect queued background work.</p></div></div>
+        <div class="tools-grid">
+          <div class="panel"><div class="panel-heading"><div><span class="eyebrow">ALLOWLISTED TOOLS</span><h2>Tool registry</h2></div></div><div id="toolList" class="tool-list"></div><div class="tool-runner"><label for="toolChoice">RUN TOOL</label><select id="toolChoice"><option value="nexus.time">nexus.time</option><option value="nexus.echo">nexus.echo</option></select><input id="toolArgument" placeholder="Text argument for nexus.echo"><button class="primary-button" id="runToolBtn">Execute tool ↗</button><pre id="toolOutput" class="output-box">Tool output will appear here.</pre></div></div>
+          <div class="panel"><div class="panel-heading"><div><span class="eyebrow">ASYNC PROCESSING</span><h2>Background tasks</h2></div><button class="outline-button" id="loadTasksBtn">Refresh</button></div><div class="task-create"><select id="taskChoice"><option>CONTEXT_SNAPSHOT</option><option>MEMORY_REINDEX</option><option>CONVERSATION_SUMMARY</option></select><button class="small-button" id="queueTaskBtn">＋ Queue task</button></div><div id="taskList" class="task-list"><div class="empty-state">Choose an active user to view tasks.</div></div><p class="muted-note">Tasks are currently persisted as QUEUED. A background worker is not implemented yet.</p></div>
+        </div>
+      </section>
+      <footer class="footer"><span>NEXUS <b>0.1</b></span><span>Built for clarity. Designed for intelligence.</span></footer>
+    </main>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="/app.js" defer></script>
+</body>
+</html>
