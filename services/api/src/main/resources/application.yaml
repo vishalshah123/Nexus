@@ -1,11 +1,34 @@
 server:
-  port: 9095
+  port: ${SERVER_PORT:9095}
+  shutdown: graceful
 
 spring:
   application:
     name: nexus-api
 
   datasource:
-    url: jdbc:postgresql://localhost:5433/nexus
-    username: nexus
-    password: ${POSTGRES_PASSWORD:nexus_dev_password}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/nexus}
+    username: ${SPRING_DATASOURCE_USERNAME:nexus}
+    password: ${SPRING_DATASOURCE_PASSWORD:${POSTGRES_PASSWORD}}
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+
+  flyway:
+    enabled: true
+
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never

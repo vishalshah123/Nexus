@@ -3,18 +3,14 @@ services:
     image: postgres:17
     container_name: nexus-postgres
     restart: unless-stopped
-
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-nexus}
       POSTGRES_USER: ${POSTGRES_USER:-nexus}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nexus_dev_password}
-
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in your .env file}
     ports:
       - "5433:5432"
-
     volumes:
       - nexus-postgres-data:/var/lib/postgresql/data
-
     healthcheck:
       test:
         - CMD-SHELL
@@ -22,6 +18,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+      start_period: 5s
 
   api:
     build:
@@ -29,15 +26,13 @@ services:
       dockerfile: Dockerfile
     container_name: nexus-api
     restart: unless-stopped
-
     ports:
-      - "9095:9095"
-
+      - "${SERVER_PORT:-9095}:9095"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/nexus
+      SERVER_PORT: 9095
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-nexus}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-nexus}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-nexus_dev_password}
-
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in your .env file}
     depends_on:
       postgres:
         condition: service_healthy
